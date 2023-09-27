@@ -1,0 +1,15 @@
+.sidebar-utama {
+    padding-top: 50vh;
+    padding-left: 20%;
+    gap: 5px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #324148;
+    color: white;
+}
+
+.text-decoration {
+    text-decoration: none;
+    color: white;
+}
