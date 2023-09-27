@@ -48,3 +48,33 @@ export function addData(params) {
             console.log('Ada error saat adding data');
         })
 }
+
+export function editData(params) {
+    const {url, payload} = params
+    fetch(url, {
+        method: "PUT",
+        body: JSON.stringify({payload}),
+        headers: {
+            "Content-type" : "application/json; charset=UTF-8"
+        }
+    })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            // const dataLama = result
+            // const dataBaru = dataLama.concat(data)
+            // return dataBaru;
+            
+        })
+        .catch((error) => {
+            console.log('Ada error saat adding data');
+        })
+}
+
+export function deleteData(params) {
+    const {url} = params
+    fetch(url, {
+        method: "DELETE"
+    })
+}
