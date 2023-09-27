@@ -1,18 +1,16 @@
-import {useState, useEffect} from 'react'
+import {useEffect} from 'react'
 
 
-export function useFetch(params) {
+export function useFetch(params, onSuccess, dependencyArray = []) {
     
-    const {url, config = {}, defaultData, dependencyArray = []} = params
-    const [result, setResult] = useState(defaultData)
-
+    const {url, config = {}, fetchWhen = () => true} = params
     function fetchData() {
         fetch(url, config)
             .then((response) => {
                 return response.json()
             })
             .then((data) => {
-                setResult(data)
+                onSuccess(data)
             })
             .catch((error) => {
                 console.log('ada error in fetch');
@@ -20,13 +18,14 @@ export function useFetch(params) {
     }
 
     useEffect(() => {
+        if (!fetchWhen()) {
+            return
+        }
         fetchData()
-    },[url, ...dependencyArray])
-
-    return result;
+    },dependencyArray)
 }
 
-export function addData(params) {
+export function addTodo(params) {
     const {url, payload} = params
     fetch(url, {
         method: "POST",
@@ -35,23 +34,27 @@ export function addData(params) {
             "Content-type" : "application/json; charset=UTF-8"
         }
     })
-        .then((response) => {
-            return response.json()
-        })
-        .then((data) => {
-            // const dataLama = result
-            // const dataBaru = dataLama.concat(data)
-            // return dataBaru;
-            
-        })
-        .catch((error) => {
-            console.log('Ada error saat adding data');
-        })
+    .then((response) => {
+        return response.json()
+    })
+}
+
+export function deletingData(params, onSuccess) {
+    const {url, id} = params
+    fetch(url, {
+        method: "DELETE"
+    })
+    .then((response) => {
+        return response.json()
+    })
+    .then(() => {
+        onSuccess(id)
+    })
 }
 
 export function editData(params) {
     const {url, payload} = params
-    fetch(url, {
+    return fetch(url, {
         method: "PUT",
         body: JSON.stringify({payload}),
         headers: {
@@ -61,20 +64,5 @@ export function editData(params) {
         .then((response) => {
             return response.json()
         })
-        .then((data) => {
-            // const dataLama = result
-            // const dataBaru = dataLama.concat(data)
-            // return dataBaru;
-            
-        })
-        .catch((error) => {
-            console.log('Ada error saat adding data');
-        })
 }
 
-export function deleteData(params) {
-    const {url} = params
-    fetch(url, {
-        method: "DELETE"
-    })
-}

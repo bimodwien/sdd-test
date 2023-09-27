@@ -1,13 +1,18 @@
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import Sidebar from '../../components/sidebar/Sidebar'
 import Header from '../../components/header/Header'
-import { addData } from '../../helpers'
+import { addTodo } from '../../helpers'
 import './add.css'
+import { useNavigate } from 'react-router-dom'
+import { ContextTodos } from '../../App'
 
 const Add = () => {
 
+    const {SET_TODOS: setTodos} = useContext(ContextTodos)
+    const navigate = useNavigate()
+
     const [input, setInput] = useState({
-        id: 1,
+        userId: 1,
         title: '',
         body: ''
     })
@@ -15,14 +20,23 @@ const Add = () => {
     function handleInputForm(params) {
         setInput({...input, [params.target.name]: params.target.value })
     }
-    const addingData = addData({
-        url: `https://jsonplaceholder.typicode.com/posts`,
-        payload: input
-    })
+  
 
     function handleSubmit(params) {
         params.preventDefault()
-        // addingData
+        addTodo({
+            url: `https://jsonplaceholder.typicode.com/posts`,
+            payload: input
+        })
+        .then((data) => {
+            setTodos((prevTodos)=>{
+                return [...prevTodos, {id: data.id, ...data.payload}]
+            });
+            navigate('/')
+        })
+        .catch((error) => {
+            console.log('ada error');
+        })
     }
 
 
@@ -48,10 +62,8 @@ const Add = () => {
                         <button type='submit'>Submit</button>
                     </form>
                 </div>
-
             </div>
         </div>
-    
     </>
   )
 }

@@ -1,16 +1,45 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Sidebar from '../../components/sidebar/Sidebar'
 import Header from '../../components/header/Header'
 import './landing.css'
-import { useFetch } from '../../helpers'
+import { deletingData, useFetch } from '../../helpers'
+import { ContextTodos } from '../../App'
+import { useNavigate } from 'react-router-dom'
 
 
 const Landing = () => {
 
-  const dataFetch = useFetch({
-    url: `https://jsonplaceholder.typicode.com/posts`,
-    defaultData: []
-  })
+  const {todos: dataTodos, SET_TODOS: setDataTodos} = useContext(ContextTodos)
+  const navigate = useNavigate()
+
+  function displayData(item) {
+      setDataTodos(item)
+  }
+  
+    useFetch({
+      url: `https://jsonplaceholder.typicode.com/posts`,
+      defaultData: [],
+      fetchWhen: () => !dataTodos.length > 0
+    }, displayData, [])
+  
+
+  function handleEdit(id) {
+    navigate(`/edit/${id}`)
+  }
+
+
+  function handleDelete(id) {
+    deletingData({
+      url: `https://jsonplaceholder.typicode.com/posts/${id}`,
+      id: id
+    }, (id) => {
+      const updatedData = dataTodos.filter((todo) => {
+        return todo.id !== id
+      })
+      setDataTodos(updatedData);
+    })
+    
+  }
 
 
   return (
@@ -24,13 +53,13 @@ const Landing = () => {
         <div className='content-utama'>
           <h3>Todos</h3>
           <div>
-            {dataFetch.map((data) => {
+            {dataTodos?.map((data) => {
               return (
-                <div>
-                  <div>{data.title}</div>
-                  <div>{data.body}</div>
-                  <button>edit</button>
-                  <button>delete</button>
+                <div key={data.id}>
+                  <div><b>Title</b>: {data.title}</div>
+                  <div><b>Body</b>: {data.body}</div>
+                  <button onClick={() => handleEdit(data.id)} >edit</button>
+                  <button onClick={() => handleDelete(data.id)}>delete</button>
                   <br />
                   <br />
                 </div>
